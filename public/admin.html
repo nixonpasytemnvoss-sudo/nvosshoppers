@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Panel de administración</title>
+<link rel="icon" href="/nvos-logo.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --navy-950:#0A1531;--navy-900:#0E1D42;--navy-800:#15275A;--navy-700:#1E356F;
+  --blue-500:#2E6FD6;--blue-300:#8FB6F0;--gold:#C79A3B;--gold-300:#E4C878;--gold-600:#9A7526;
+  --mist:#F4F7FC;--mist-2:#E9EFF8;--paper:#fff;--text:#132244;--soft:#5C6B86;--line:#DCE5F2;
+  --green:#2E7D57;--rouge:#C24338;--warn:#9A6A12;
+  --sh:0 2px 6px rgba(10,21,49,.06);--sh2:0 8px 26px rgba(10,21,49,.12);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--mist);color:var(--text);font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:1.55}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+img{max-width:100%;display:block}
+:focus-visible{outline:2px solid var(--blue-500);outline-offset:2px}
+h1,h2,h3{margin:0}
+
+/* Acceso */
+.gate{min-height:100vh;display:grid;place-items:center;padding:20px;
+  background:radial-gradient(ellipse 70% 80% at 80% 10%,rgba(46,111,214,.35),transparent 60%),
+             radial-gradient(ellipse 50% 60% at 8% 92%,rgba(199,154,59,.16),transparent 64%),
+             linear-gradient(170deg,#0E1D42,#0A1531)}
+.gate .box{background:var(--paper);border-radius:16px;box-shadow:0 30px 70px rgba(4,12,34,.5);width:min(400px,100%);padding:34px 30px;text-align:center}
+.gate .box img{width:86px;margin:0 auto 14px}
+.gate h1{font-family:Oswald,sans-serif;font-weight:600;text-transform:uppercase;font-size:21px;color:var(--navy-900)}
+.gate p{color:var(--soft);font-size:13px;margin:8px 0 20px}
+.gate input{width:100%;border:1px solid var(--line);border-radius:9px;padding:12px 14px;font-size:14px;text-align:center;letter-spacing:.14em}
+.gate input:focus{outline:0;border-color:var(--navy-900)}
+.gate button{width:100%;margin-top:12px;background:var(--navy-900);color:#EAF1FB;border-radius:9px;padding:13px;font-family:Oswald,sans-serif;font-weight:500;text-transform:uppercase;letter-spacing:.1em;font-size:13px}
+.gate button:hover{background:var(--blue-500)}
+.gate .err{color:#8E3B32;font-size:12.5px;min-height:20px;margin-top:10px}
+
+/* Estructura */
+.app{display:none;min-height:100vh}.app.on{display:block}
+.abar{position:sticky;top:0;z-index:40;background:var(--navy-900);color:#EAF1FB;box-shadow:var(--sh2)}
+.abar-in{max-width:1300px;margin:0 auto;padding:12px clamp(14px,3vw,28px);display:flex;align-items:center;gap:16px}
+.abar img{width:38px}
+.abar .t{line-height:1.1}
+.abar .t .n{font-family:Oswald,sans-serif;font-weight:600;text-transform:uppercase;font-size:17px;letter-spacing:.05em}
+.abar .t .n b{color:var(--gold-300)}
+.abar .t .s{display:block;font-size:10px;letter-spacing:.24em;color:var(--blue-300);text-transform:uppercase;margin-top:2px}
+.abar .right{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:12.5px;flex-wrap:wrap}
+.chip{border-radius:999px;padding:4px 12px;font-weight:700;font-size:11px;letter-spacing:.04em}
+.chip.ok{background:rgba(46,125,87,.25);color:#9FE3C0}
+.chip.warn{background:rgba(199,154,59,.22);color:var(--gold-300)}
+.chip.bad{background:rgba(194,67,56,.3);color:#FFC7C0}
+.aout{color:#9BB2D6;font-weight:600}.aout:hover{color:#fff}
+
+.tabs{background:var(--navy-800)}
+.tabs-in{max-width:1300px;margin:0 auto;padding:0 clamp(14px,3vw,28px);display:flex;gap:2px;overflow-x:auto}
+.tab{font-family:Oswald,sans-serif;font-weight:400;text-transform:uppercase;font-size:13px;letter-spacing:.08em;color:#A9C2E6;padding:13px 16px;white-space:nowrap;position:relative}
+.tab:hover{color:#fff}
+.tab[aria-selected="true"]{color:#fff}
+.tab[aria-selected="true"]::after{content:"";position:absolute;left:14px;right:14px;bottom:0;height:3px;background:var(--gold)}
+
+.main{max-width:1300px;margin:0 auto;padding:clamp(18px,3vw,30px) clamp(14px,3vw,28px) 60px}
+.view{display:none}.view.on{display:block}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh);padding:clamp(16px,2.4vw,24px);margin-bottom:18px}
+.card h2{font-family:Oswald,sans-serif;font-weight:600;text-transform:uppercase;font-size:16px;letter-spacing:.05em;margin:0 0 4px;color:var(--navy-900)}
+.sub{color:var(--soft);font-size:12.5px;margin:0 0 16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.f{display:flex;flex-direction:column;gap:6px}
+.f label{font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--soft)}
+.f input,.f select,.f textarea{border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:13.5px;background:var(--paper);width:100%}
+.f input:focus,.f select:focus,.f textarea:focus{outline:0;border-color:var(--navy-900)}
+.f small{color:var(--soft);font-size:11.5px}
+.btn{background:var(--navy-900);color:#EAF1FB;border-radius:9px;padding:11px 22px;font-family:Oswald,sans-serif;font-weight:500;text-transform:uppercase;letter-spacing:.08em;font-size:12.5px;transition:background .16s}
+.btn:hover{background:var(--blue-500)}
+.btn.gold{background:var(--gold);color:#20170A}.btn.gold:hover{background:var(--gold-300)}
+.btn.soft{background:var(--mist-2);color:var(--navy-900)}.btn.soft:hover{background:var(--line)}
+.btn.danger{background:#FBE9E7;color:#8E3B32}.btn.danger:hover{background:#F2C6C0}
+.btn.sm{padding:7px 14px;font-size:11.5px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.right-al{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;flex-wrap:wrap}
+
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{font-family:Oswald,sans-serif;font-weight:500;text-transform:uppercase;font-size:10.5px;letter-spacing:.09em;color:var(--soft);text-align:left;padding:9px 10px;border-bottom:2px solid var(--line);white-space:nowrap}
+.tbl td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl tr:hover td{background:var(--mist)}
+.tbl .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl input,.tbl select{border:1px solid var(--line);border-radius:7px;padding:6px 8px;font-size:12.5px;background:var(--paper)}
+.tbl input{width:82px;text-align:right}
+.tbl select{width:auto}
+.src{border-radius:6px;padding:3px 9px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.src.api{background:var(--mist-2);color:var(--blue-500)}
+.src.man{background:#FDF3DE;color:var(--gold-600)}
+.pill{border-radius:6px;padding:3px 9px;font-size:10.5px;font-weight:700;background:var(--mist-2);color:var(--soft)}
+.pill.pendiente_pago{background:#FDF3DE;color:var(--warn)}.pill.pagado{background:#E1EEF8;color:#2C79B4}.pill.en_proceso{background:#E6EAF0;color:#4F5F73}.pill.enviado{background:#E9E1FF;color:#5B3FB8}.pill.entregado{background:#E7F4EC;color:var(--green)}.pill.cancelado{background:#FBE9E7;color:var(--rouge)}
+.thumb{width:40px;min-width:40px;height:40px;border-radius:8px;border:1px solid var(--line);object-fit:contain;background:#fff}
+.searchrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.searchrow input,.searchrow select{border:1px solid var(--line);border-radius:9px;padding:10px 14px;background:var(--paper)}
+.searchrow input[type=search],.searchrow input:first-child{flex:1;min-width:200px}
+.scroll{overflow-x:auto}
+.muted{color:var(--soft)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+@media(max-width:820px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--sh)}
+.kpi .v{font-family:Oswald,sans-serif;font-weight:600;font-size:24px;color:var(--navy-900);line-height:1.1}
+.kpi .l{font-size:11px;color:var(--soft);letter-spacing:.04em;margin-top:3px}
+.oitem{border:1px solid var(--line);border-radius:12px;background:var(--paper);padding:14px 16px;margin-bottom:12px}
+.oitem .r1{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-family:Oswald,sans-serif;font-weight:500;font-size:15px;letter-spacing:.03em}
+.oitem .r2{color:var(--soft);font-size:12.5px;margin:2px 0 8px}
+.oitem ul{margin:0 0 8px;padding-left:18px}
+.oitem .fin{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;margin-bottom:10px}
+.oitem .act{display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--line);padding-top:10px}
+.oitem .act input,.oitem .act select{border:1px solid var(--line);border-radius:7px;padding:7px 8px}
+.profit{color:var(--green)}.loss{color:var(--rouge)}
+.imgdrop{border:2px dashed var(--line);border-radius:10px;padding:14px;text-align:center;cursor:pointer;color:var(--soft);display:flex;gap:10px;align-items:center;justify-content:center;background:var(--mist)}
+.imgdrop img{width:70px;height:70px;object-fit:contain}
+.imgdrop.wide img{width:100%;height:auto;max-height:120px;object-fit:cover;border-radius:6px}
+.flash{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(calc(100% + 48px));background:var(--navy-900);color:var(--gold-300);padding:12px 22px;border-radius:999px;font-weight:600;font-size:13px;box-shadow:var(--sh2);transition:transform .25s;z-index:99}
+.flash.show{transform:translateX(-50%) translateY(0)}
+.chanCards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.chan{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--paper)}
+.chan h3{font-family:Oswald,sans-serif;font-weight:500;text-transform:uppercase;letter-spacing:.06em;font-size:14px;margin-bottom:6px;color:var(--navy-900)}
+.chan .row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0}
+.chan .fees{display:flex;gap:6px;margin:8px 0}.chan .fees input{width:60px;border:1px solid var(--line);border-radius:7px;padding:5px}
+code{background:var(--mist-2);padding:1px 6px;border-radius:5px;font-size:12px;color:var(--navy-900)}
+textarea.csv{width:100%;min-height:120px;font-family:ui-monospace,monospace;font-size:12px}
+.note{background:#FDF3DE;color:var(--warn);border-radius:9px;padding:10px 12px;font-size:13px;margin-bottom:12px;border:1px solid #F1E2BD}
+.note.bad{background:#FBE9E7;color:#8E3B32;border-color:#F2C6C0}
+.note.ok{background:#E7F4EC;color:var(--green);border-color:#C6E6D3}
+.seg{display:inline-flex;flex-wrap:wrap;gap:6px;background:var(--mist-2);border-radius:12px;padding:5px;margin-bottom:16px}
+.seg button{font-family:Oswald,sans-serif;font-weight:500;text-transform:uppercase;letter-spacing:.07em;font-size:12.5px;color:var(--soft);padding:10px 18px;border-radius:9px;display:inline-flex;align-items:center;gap:9px;transition:background .15s,color .15s}
+.seg button:hover{color:var(--navy-900)}
+.seg button[aria-pressed="true"]{background:var(--navy-900);color:#fff;box-shadow:var(--sh)}
+.seg button i{font-style:normal;font-family:Inter,sans-serif;font-weight:700;font-size:11px;letter-spacing:0;background:rgba(19,34,68,.1);border-radius:999px;padding:2px 9px}
+.seg button[aria-pressed="true"] i{background:var(--gold);color:#20170A}
+.kpinote{color:var(--soft);font-size:12.5px;margin:-8px 0 18px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chipb{border:1px solid var(--line);border-radius:999px;padding:6px 13px;font-size:12.5px;font-weight:600;color:var(--soft);background:var(--paper);transition:all .14s}
+.chipb:hover{border-color:var(--navy-700);color:var(--navy-900)}
+.chipb[aria-pressed="true"]{background:var(--navy-900);border-color:var(--navy-900);color:#fff}
+.modal{position:fixed;inset:0;background:rgba(10,21,49,.55);display:none;place-items:center;z-index:90;padding:18px}
+.modal.on{display:grid}
+.mbox{background:var(--paper);border-radius:16px;box-shadow:0 30px 70px rgba(4,12,34,.45);width:min(560px,100%);padding:24px;max-height:90vh;overflow:auto}
+.mbox h3{font-family:Oswald,sans-serif;font-weight:600;text-transform:uppercase;font-size:16px;letter-spacing:.05em;color:var(--navy-900);margin-bottom:4px}
+.scan{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.scan input[type=text]{flex:1;min-width:240px;border:2px solid var(--navy-900);border-radius:10px;padding:13px 16px;font-size:17px;letter-spacing:.08em;font-variant-numeric:tabular-nums}
+.scan input[type=text]:focus{outline:0;border-color:var(--gold);box-shadow:0 0 0 4px rgba(199,154,59,.2)}
+.scan label{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--text)}
+.cands{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.cand{width:74px;height:74px;border:2px solid var(--line);border-radius:10px;background:#fff;overflow:hidden;padding:3px;transition:border-color .14s}
+.cand:hover{border-color:var(--gold)}
+.cand img{width:100%;height:100%;object-fit:contain}
+.brandgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.brow{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--paper)}
+.brow .lg{width:74px;height:40px;border-radius:6px;background:var(--mist);display:grid;place-items:center;flex:none;overflow:hidden;font-size:10px;color:var(--soft);cursor:pointer;border:1px dashed var(--line)}
+.brow .lg img{max-width:100%;max-height:100%;object-fit:contain}
+.brow .bn{flex:1;min-width:0;font-size:12.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.brow .bn small{display:block;font-weight:400;color:var(--soft)}
+.bar{height:9px;border-radius:999px;background:var(--mist-2);overflow:hidden;margin:8px 0}
+.bar > i{display:block;height:100%;background:var(--green);transition:width .4s}
+.stk{font-size:11px;color:var(--soft);white-space:nowrap}
+.hide{display:none!important}
+pre.dump{background:var(--navy-950);color:#C7D6F0;border-radius:9px;padding:12px;font-size:12px;overflow:auto;max-height:260px;margin:10px 0 0}
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate"><div class="box">
+  <img src="/nvos-logo.svg" alt="" /><h1>Panel de administración</h1><p>Solo para la dueña de la tienda.</p>
+  <input id="gatePw" type="password" placeholder="Contraseña" autocomplete="current-password" />
+  <input id="gateCode" type="text" inputmode="numeric" maxlength="7" placeholder="Código de 6 dígitos" autocomplete="one-time-code" style="margin-top:10px;display:none" />
+  <button id="gateGo">Entrar</button><div class="err" id="gateErr"></div>
+</div></div>
+
+<div class="app" id="app">
+  <header class="abar"><div class="abar-in">
+    <img src="/nvos-logo.svg" alt="" /><div class="t"><span class="n" id="aName">NV<b>O</b>S</span><span class="s">Panel de administración</span></div>
+    <div class="right"><span class="chip" id="apiChip">…</span><span class="chip" id="dbChip">…</span><a class="aout" href="/" target="_blank">Ver tienda</a><button class="aout" id="doLogout">Salir</button></div>
+  </div></header>
+  <nav class="tabs"><div class="tabs-in" role="tablist">
+    <button class="tab" data-v="cat" aria-selected="true">Catálogo</button>
+    <button class="tab" data-v="man" aria-selected="false">Mi inventario</button>
+    <button class="tab" data-v="imp" aria-selected="false">Importar CSV</button>
+    <button class="tab" data-v="pri" aria-selected="false">Precios</button>
+    <button class="tab" data-v="ord" aria-selected="false">Pedidos</button>
+    <button class="tab" data-v="tax" aria-selected="false">Impuestos</button>
+    <button class="tab" data-v="cli" aria-selected="false">Clientes</button>
+    <button class="tab" data-v="ref" aria-selected="false">Referidos</button>
+    <button class="tab" data-v="chan" aria-selected="false">Canales</button>
+    <button class="tab" data-v="set" aria-selected="false">Ajustes</button>
+  </div></nav>
+
+  <main class="main">
+    <!-- CATÁLOGO -->
+    <section class="view on" id="v-cat">
+      <div class="kpis" id="kpis"></div>
+      <p class="kpinote" id="kpiNote"></p>
+      <div class="card">
+        <div class="seg" id="catSrc">
+          <button data-src="" aria-pressed="true">Catálogo completo <i id="nAll">0</i></button>
+          <button data-src="api" aria-pressed="false">Catálogo proveedor <i id="nApi">0</i></button>
+          <button data-src="own" aria-pressed="false">Catálogo inventario mío <i id="nOwn">0</i></button>
+        </div>
+        <h2 id="catTitle">Catálogo completo</h2>
+        <p class="sub" id="catSub"></p>
+        <div id="apiMsg"></div>
+        <div class="searchrow"><input type="search" id="catQ" placeholder="Buscar por nombre, marca, categoría o UPC" />
+          <select id="catF"><option value="">Todas las categorías</option></select>
+          <select id="catShip"><option value="">Con y sin ficha de envío</option><option value="sin">Solo sin ficha de envío</option></select>
+          <span class="muted" id="catCount"></span><button class="btn soft sm" id="apiRefresh">Actualizar del proveedor</button></div>
+        <div class="scroll"><table class="tbl"><thead><tr><th></th><th>Producto</th><th>Fuente</th><th>Categoría</th><th>Para · notas</th><th class="num">Stock</th><th class="num">Costo</th><th class="num">Precio web</th><th>Peso (oz)</th><th>L × A × H (in)</th><th>Al mayor (mín / precio)</th><th>Dest.</th><th>Web</th><th></th></tr></thead><tbody id="catRows"></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- MIS PRODUCTOS -->
+    <section class="view" id="v-man">
+      <div class="card">
+        <h2>Escanear código de barras</h2>
+        <p class="sub">Haz clic en la casilla y dispara la pistola sobre el código del producto. Si ya está en tu inventario se abre para editarlo (o suma 1 al stock en modo recepción); si lo tiene el proveedor, se copian nombre, marca, foto y descripción; si no, se busca en bases públicas de códigos de barras.</p>
+        <div class="scan">
+          <input type="text" id="scanIn" inputmode="numeric" autocomplete="off" placeholder="Escanea o escribe el UPC y pulsa Enter" />
+          <button class="btn" id="scanGo">Buscar</button>
+          <label><input type="checkbox" id="scanAdd"> Modo recepción: cada escaneo suma 1 al stock</label>
+        </div>
+        <div id="scanOut" style="margin-top:12px"></div>
+      </div>
+      <div class="card">
+        <h2 id="manTitle">Añadir producto a mi inventario</h2>
+        <p class="sub">Tu mercancía (perfumes que ya compraste, chocolates, enlatados…). Si usas el mismo UPC que un producto del proveedor, se unen en una sola ficha y <b>tu stock se vende primero</b>; al proveedor solo se le pide lo que tú no tengas.</p>
+        <div class="grid2">
+          <div class="f"><label for="m_name">Nombre *</label><input id="m_name" placeholder="Good Girl Eau de Parfum 2.7 oz" /></div>
+          <div class="f"><label for="m_brand">Marca</label><input id="m_brand" list="brandList" placeholder="Carolina Herrera, Savoy…" /><datalist id="brandList"></datalist></div>
+          <div class="f"><label for="m_cat">Categoría</label><select id="m_cat"></select><small id="m_catHint"></small></div>
+          <div class="f"><label for="m_type">Subtipo (opcional)</label><input id="m_type" placeholder="Eau de Parfum, tableta, lata 425 g…" /></div>
+          <div class="f"><label for="m_upc">UPC / código de barras</label><input id="m_upc" placeholder="7591234567890" /></div>
+          <div class="f"><label for="m_supplier">Proveedor (opcional)</label><input id="m_supplier" placeholder="Propio" /></div>
+          <div class="f"><label for="m_cost">Tu costo (USD) *</label><input id="m_cost" type="number" min="0" step="0.01" /></div>
+          <div class="f"><label for="m_stock">Stock *</label><input id="m_stock" type="number" min="0" step="1" /></div>
+          <div class="f"><label for="m_cond">Condición</label><select id="m_cond"><option value="nuevo">Nuevo</option><option value="usado_casi_nuevo">Usado casi nuevo</option><option value="caja_abierta">Caja abierta</option></select><small>Se publica en eBay y los demás canales con el código de condición correcto.</small></div>
+          <div class="f"><label for="m_price">Precio de venta (opcional)</label><input id="m_price" type="number" min="0" step="0.01" placeholder="Costo + margen" /><small>Vacío = se calcula solo con tu margen.</small></div>
+          <div class="f perf-only"><label for="m_gender">Para (solo perfumes)</label><select id="m_gender"><option value="">Detectar por el nombre</option><option value="Damas">Damas · Women</option><option value="Caballeros">Caballeros · Men</option><option value="Unisex">Unisex</option></select></div>
+          <div class="f perf-only" style="grid-column:1/-1"><label>Notas olfativas (solo perfumes)</label><div class="chips" id="m_notes"></div><small>Sin marcar = se detectan solas por el nombre y la descripción.</small></div>
+        </div>
+        <h2 style="margin-top:18px;font-size:16px">Ficha de envío (ShipStation)</h2>
+        <div class="grid2">
+          <div class="f"><label for="m_w">Peso (oz) *</label><input id="m_w" type="number" min="0" step="0.1" /><small>1 lb = 16 oz · 100 g ≈ 3.5 oz</small></div>
+          <div class="f"><label for="m_l">Largo (in)</label><input id="m_l" type="number" min="0" step="0.1" /></div>
+          <div class="f"><label for="m_wd">Ancho (in)</label><input id="m_wd" type="number" min="0" step="0.1" /></div>
+          <div class="f"><label for="m_h">Alto (in)</label><input id="m_h" type="number" min="0" step="0.1" /><small>1 in = 2.54 cm</small></div>
+        </div>
+        <h2 style="margin-top:18px;font-size:16px">Venta al mayor (opcional)</h2>
+        <div class="grid2">
+          <div class="f"><label for="m_wmin">Cantidad mínima</label><input id="m_wmin" type="number" min="0" step="1" placeholder="12" /></div>
+          <div class="f"><label for="m_wpr">Precio al mayor por unidad (USD)</label><input id="m_wpr" type="number" min="0" step="0.01" /><small>En eBay se publica con la comisión del canal sumada.</small></div>
+          <div class="f"><label for="m_tags">Etiquetas (coma)</label><input id="m_tags" placeholder="venezolano, queso, fresco" /></div>
+          <div class="f"><label for="m_feat">Destacado en portada</label><select id="m_feat"><option value="">No</option><option value="1">Sí</option></select></div>
+        </div>
+        <div class="grid2" style="margin-top:14px">
+          <div class="f"><label>Foto</label><div class="imgdrop" id="imgDrop"><div id="imgPrev"></div><span id="imgHint">Haz clic para subir una foto</span></div><input type="file" id="m_file" accept="image/png,image/jpeg,image/webp" hidden />
+            <label style="display:flex;gap:8px;align-items:center;text-transform:none;letter-spacing:0;font-size:12.5px;font-weight:500;color:var(--text)"><input type="checkbox" id="m_white" checked style="width:auto"> Dejarla cuadrada sobre fondo blanco</label>
+            <div style="display:flex;gap:6px"><input id="m_imgUrl" placeholder="…o pega el enlace (https) de una foto" /><button class="btn soft sm" id="m_imgGo" type="button">Traer</button><button class="btn soft sm hide" id="m_imgG" type="button">Buscar en Google</button></div>
+            <div class="cands" id="imgCands"></div></div>
+          <div class="f"><label for="m_desc">Descripción</label><textarea id="m_desc" rows="6" placeholder="Qué es, presentación, ingredientes, conservación…"></textarea></div>
+        </div>
+        <div class="right-al"><button class="btn soft" id="mReset">Limpiar</button><button class="btn gold" id="mSave">Guardar producto</button></div>
+      </div>
+      <div class="card"><h2>Mi inventario</h2><div class="searchrow"><input type="search" id="manQ" placeholder="Buscar en mi inventario por nombre, marca, categoría o UPC" /><select id="manF"><option value="">Todas las categorías</option></select><span class="muted" id="manCount"></span></div><div class="scroll"><table class="tbl"><thead><tr><th></th><th>Producto</th><th>Categoría</th><th class="num">Costo</th><th class="num">Precio</th><th class="num">Stock</th><th>Envío</th><th>Dónde se vende</th><th></th></tr></thead><tbody id="manRows"></tbody></table></div></div>
+    </section>
+
+    <!-- IMPORTAR -->
+    <section class="view" id="v-imp">
+      <div class="card">
+        <h2>Importar productos desde CSV</h2>
+        <p class="sub">Pega el contenido de tu hoja (Excel → Guardar como CSV) o súbela. Primera fila = encabezados. Columnas reconocidas: <code>upc, nombre, marca, categoria, subtipo, costo, stock, peso_oz, largo_in, ancho_in, alto_in, mayor_min, mayor_precio, descripcion, imagen, etiquetas, destacado</code>. Si el <code>upc</code> ya existe entre tus productos, se actualiza.</p>
+        <input type="file" id="csvFile" accept=".csv,text/csv" />
+        <textarea class="csv" id="csvText" placeholder="upc,nombre,marca,categoria,costo,stock,peso_oz,largo_in,ancho_in,alto_in&#10;7591234567890,Tequeños de queso 24 und,Tequemosh,Refrigerados,8.50,40,24,9,6,2"></textarea>
+        <div class="right-al"><button class="btn soft" id="csvPreview">Previsualizar</button><button class="btn gold" id="csvGo" disabled>Importar</button></div>
+        <div id="csvOut" style="margin-top:12px"></div>
+      </div>
+    </section>
+
+    <!-- PRECIOS -->
+    <section class="view" id="v-pri">
+      <div class="card"><h2>Reglas de margen</h2><p class="sub">Precio web = costo + margen. Jerarquía: manual por producto › por categoría › general. Los canales (eBay 15 %) suben el precio solos para absorber su comisión.</p>
+        <div class="grid2">
+          <div class="f"><label for="p_global">Margen general (%)</label><input id="p_global" type="number" step="1" /></div>
+          <div class="f"><label for="p_round">Redondeo</label><select id="p_round"><option value="ends99">Terminar en ,99</option><option value="none">Sin redondeo</option></select></div>
+          <div class="f"><label for="p_cmp">Precio tachado (referencia)</label><select id="p_cmp"><option value="1">Mostrar si existe</option><option value="0">Ocultar todos</option></select></div>
+        </div>
+        <h2 style="margin-top:16px;font-size:16px">Margen por categoría</h2><div class="grid2" id="catMargins"></div>
+        <div class="right-al"><button class="btn gold" id="priSave">Guardar reglas</button></div></div>
+      <div class="card"><h2>Precios por producto</h2>
+        <div class="searchrow"><input type="search" id="priQ" placeholder="Buscar" /><select id="priChan"></select></div>
+        <div class="scroll"><table class="tbl"><thead><tr><th>Producto</th><th class="num">Costo</th><th>Margen %</th><th>Precio ref.</th><th class="num">Precio web</th><th class="num">Precio canal</th><th class="num">Ganancia neta</th></tr></thead><tbody id="priRows"></tbody></table></div></div>
+    </section>
+
+    <!-- PEDIDOS -->
+    <section class="view" id="v-ord">
+      <div class="card"><h2>Pedidos</h2><p class="sub">Cambia el estado y el cliente recibe un correo. Con las llaves de ShipStation, el botón crea la orden con el peso y las medidas de cada artículo.</p>
+        <div class="searchrow"><select id="ordF"><option value="">Todos los estados</option><option value="pendiente_pago">Pendiente de pago</option><option value="pagado">Pagado</option><option value="en_proceso">En preparación</option><option value="enviado">Enviado</option><option value="entregado">Entregado</option><option value="cancelado">Cancelado</option></select></div>
+        <div id="ordList"></div></div>
+    </section>
+
+    <!-- IMPUESTOS -->
+    <section class="view" id="v-tax">
+      <div class="card"><h2>Reporte de impuestos del mes</h2><p class="sub">Lo que la tienda cobró de <i>sales tax</i> en cada estado, según la fecha de pago. Es lo que tu contador necesita para declarar. Las ventas de eBay y los demás marketplaces van aparte: allí el impuesto lo cobra y lo declara el marketplace.</p>
+        <div class="searchrow"><input type="month" id="taxMonth" style="flex:none;min-width:170px" /><button class="btn soft sm" id="taxGo">Ver mes</button><a class="btn gold sm" id="taxCsv" href="#">Descargar resumen (CSV)</a><a class="btn soft sm" id="taxCsvD" href="#">Descargar pedido por pedido (CSV)</a></div>
+        <div class="kpis" id="taxKpis"></div><div id="taxOut"></div></div>
+      <div class="card"><h2>Estados donde cobras impuesto</h2><p class="sub">Están los 50 estados y DC con su tasa estatal. <b>Activa solo los estados donde estás registrada para cobrar</b> (el tuyo y los que te indique tu contador); cobrar impuesto sin estar registrada en ese estado no está permitido. La tasa se puede editar: si tu contador te pide cobrar la tasa combinada con la local, escríbela aquí. “Envío” indica si en ese estado el costo de envío también paga impuesto.</p>
+        <div class="searchrow"><input type="search" id="taxQ" placeholder="Buscar estado" style="max-width:260px" /><button class="btn soft sm" id="taxOrig">Restaurar tasas estatales</button><span class="muted" id="taxCount"></span><span style="flex:1"></span><button class="btn gold" id="taxSave">Guardar estados</button></div>
+        <div class="scroll"><table class="tbl"><thead><tr><th>Cobrar</th><th>Estado</th><th>Tasa a cobrar (%)</th><th class="num">Tasa estatal</th><th class="num">Promedio local</th><th>Envío paga impuesto</th></tr></thead><tbody id="taxRows"></tbody></table></div>
+        <p class="muted" id="taxAsOf" style="margin-top:10px"></p></div>
+    </section>
+
+    <!-- CLIENTES -->
+    <section class="view" id="v-cli"><div class="card"><h2>Clientes registrados</h2><p class="sub">Cuentas creadas con Google o correo. El correo de bienvenida se envía solo la primera vez que entran.</p><div class="scroll"><table class="tbl"><thead><tr><th>Nombre</th><th>Correo</th><th>Método</th><th>Registro</th><th>Dirección</th></tr></thead><tbody id="cliRows"></tbody></table></div></div></section>
+
+    <!-- REFERIDOS -->
+    <section class="view" id="v-ref">
+      <div class="card"><h2>Reglas generales</h2><p class="sub">Aplican a todo código que no tenga porcentajes propios. El comprador recibe el descuento al pagar con código; el dueño gana saldo cuando marcas el pedido como <b>pagado</b>. Si el pedido se cancela, el saldo se revierte solo.</p>
+        <div class="grid2">
+          <div class="f"><label for="r_buyer">Descuento del comprador (%)</label><input id="r_buyer" type="number" min="0" max="50" step="0.5" /></div>
+          <div class="f"><label for="r_owner">Ganancia del dueño del código (%)</label><input id="r_owner" type="number" min="0" max="50" step="0.5" /><small>Sobre el subtotal ya con descuento.</small></div>
+          <div class="f"><label for="r_min">Compra mínima para usar código (USD)</label><input id="r_min" type="number" min="0" step="1" /></div>
+        </div>
+        <div class="right-al"><button class="btn gold" id="refRules">Guardar reglas</button></div></div>
+      <div class="card"><h2>Activar código a un cliente</h2><p class="sub">Esto no es para todo el mundo: tú eliges quién se vuelve vendedor. Escribe su correo (o elígelo de la lista de clientes) y se le crea un código; si dejas el código vacío, se genera solo.</p>
+        <div class="grid2">
+          <div class="f"><label for="rc_email">Correo del cliente *</label><input id="rc_email" list="cliList" placeholder="cliente@gmail.com" /><datalist id="cliList"></datalist></div>
+          <div class="f"><label for="rc_name">Nombre</label><input id="rc_name" placeholder="Se toma del perfil si existe" /></div>
+          <div class="f"><label for="rc_code">Código (opcional)</label><input id="rc_code" placeholder="MARIA-10" style="text-transform:uppercase" /></div>
+          <div class="f"><label for="rc_bp">% comprador (vacío = regla general)</label><input id="rc_bp" type="number" min="0" max="50" step="0.5" /></div>
+          <div class="f"><label for="rc_op">% dueño (vacío = regla general)</label><input id="rc_op" type="number" min="0" max="50" step="0.5" /></div>
+        </div>
+        <div class="right-al"><button class="btn gold" id="refAdd">Activar código</button></div></div>
+      <div class="card"><h2>Códigos activos</h2>
+        <div class="scroll"><table class="tbl"><thead><tr><th>Código</th><th>Cliente</th><th class="num">% compr.</th><th class="num">% dueño</th><th class="num">Saldo</th><th class="num">Ganado</th><th class="num">Usos</th><th>Estado</th><th></th></tr></thead><tbody id="refRows"></tbody></table></div></div>
+      <div class="card"><h2>Movimientos de saldo</h2><div class="scroll"><table class="tbl"><thead><tr><th>Fecha</th><th>Código</th><th>Pedido</th><th>Tipo</th><th class="num">Monto</th><th>Nota</th></tr></thead><tbody id="refLog"></tbody></table></div></div>
+    </section>
+
+    <!-- CANALES -->
+    <section class="view" id="v-chan">
+      <div class="card"><h2>Canales de venta</h2><p class="sub">Tus tres marketplaces. Cada uno calcula su precio para que, después de su comisión, te quede la misma ganancia que en la web.</p><div class="chanCards" id="chanCards"></div></div>
+      <div class="card"><h2>eBay</h2><p class="sub">Publica tus productos con foto, descripción, precio y stock; trae las ventas y devuelve la guía de envío.</p><div id="ebayBox"></div></div>
+      <div class="card"><h2>Conexiones</h2><div id="integr"></div>
+        <p class="muted" style="margin-top:10px">Aviso de ventas desde Walmart o Mercado Libre: <code>POST /api/channels/{walmart|mercadolibre}/order</code> con cabecera <code>X-Channel-Secret</code>. Cuerpo: <code>{"externalId":"…","buyer":{…},"items":[{"sku":"UPC","qty":2}]}</code>. La venta descuenta primero tu inventario y deja lista la parte que se le pide a Shoppex.</p></div>
+    </section>
+
+    <!-- AJUSTES -->
+    <section class="view" id="v-set">
+      <div class="card"><h2>Tienda</h2><div class="grid2">
+        <div class="f"><label for="s_name">Nombre</label><input id="s_name" /></div>
+        <div class="f"><label for="s_tag">Subtítulo (bajo el nombre: “Casa de compras”)</label><input id="s_tag" /></div>
+        <div class="f"><label for="s_wa">WhatsApp (con código de país)</label><input id="s_wa" placeholder="+1 305 555 0100" /></div></div></div>
+      <div class="card"><h2>Portada</h2><p class="sub">El titular grande de la portada y el texto que lo acompaña. Lo que va después de la última coma sale en dorado e itálica.</p><div class="grid2">
+        <div class="f" style="grid-column:1/-1"><label for="s_head">Titular</label><input id="s_head" placeholder="Tu mercado global, con elegancia." /></div>
+        <div class="f" style="grid-column:1/-1"><label for="s_lede">Texto de apoyo</label><textarea id="s_lede" rows="2" placeholder="Si lo dejas vacío, se arma solo con tus categorías."></textarea></div>
+        <div class="f" style="grid-column:1/-1"><label for="s_headEn">Titular en inglés (el que se ve al abrir la página)</label><input id="s_headEn" placeholder="Your signature scent, delivered." /></div>
+        <div class="f" style="grid-column:1/-1"><label for="s_ledeEn">Texto de apoyo en inglés</label><textarea id="s_ledeEn" rows="2" placeholder="Si lo dejas vacío, se usa el texto estándar en inglés."></textarea></div></div></div>
+      <div class="card"><h2>Logos de marcas</h2><p class="sub">Sube el logo oficial de cada marca (SVG o PNG con fondo transparente). Aparece en la cinta de marcas de la portada y en la página de marcas; las que no tengan logo se muestran con su nombre.</p>
+        <div class="searchrow"><input type="search" id="brQ" placeholder="Buscar marca" /><select id="brF"><option value="">Todas</option><option value="sin">Sin logo</option><option value="con">Con logo</option></select><span class="muted" id="brCount"></span></div>
+        <div class="brandgrid" id="brGrid"></div></div>
+      <div class="card"><h2>Banners</h2><p class="sub">Imágenes publicitarias de la portada. Sube JPG o PNG (1600 × 520 px el principal, 1600 × 420 px los de categoría). Si no subes uno, esa franja simplemente no se muestra. Las tres fotos de tarjeta reemplazan la fila de frascos de Women, Men y Unisex.</p><div id="bnrCfg" class="grid2"></div></div>
+      <div class="card"><h2>Categorías</h2><p class="sub">Crea las categorías que necesites para tu inventario (Perfumería, Chocolates, Enlatados, Cuidado personal…). Solo las que marques abajo en “Visibilidad” salen en la web.</p><div id="catCfg"></div>
+        <div class="searchrow" style="margin-top:12px"><input id="catNew" placeholder="Nombre de la nueva categoría" style="max-width:340px" /><button class="btn soft sm" id="catAdd">Añadir categoría</button></div>
+        <div class="f" style="max-width:420px;margin-top:8px"><label for="s_supCat">Categoría de los productos del proveedor</label><select id="s_supCat"></select><small>Shoppex es perfumería: todo lo suyo entra aquí salvo lo que cambies producto por producto en Catálogo.</small></div></div>
+      <div class="card"><h2>Visibilidad en tu web</h2><p class="sub">Marca qué categorías se ven en la tienda propia. Lo demás <b>no aparece en la web</b>: queda como inventario para publicarlo en eBay, Walmart o Mercado Libre. En la pestaña Catálogo puedes forzar producto por producto con la casilla "Web".</p>
+        <div style="margin-bottom:12px"><label style="display:flex;gap:8px;align-items:center;font-size:13px"><input type="checkbox" id="v_enforce"> Activar el filtro (si está apagado, todo se ve en la web)</label></div>
+        <div class="grid2" id="visCats"></div></div>
+      <div class="card"><h2>Envío</h2><div class="grid2">
+        <div class="f"><label for="s_free">Envío gratis desde (USD)</label><input id="s_free" type="number" step="1" /></div>
+        <div class="f"><label for="s_flat">Envío estándar (USD)</label><input id="s_flat" type="number" step="0.01" /></div>
+        <div class="f"><label for="s_oz">Recargo por onza (USD)</label><input id="s_oz" type="number" step="0.01" /><small>Opcional. 0 = solo tarifa fija.</small></div></div>
+        <div class="f" style="margin-top:12px"><label style="text-transform:none;letter-spacing:0;font-size:13px;font-weight:500;color:var(--text)"><input type="checkbox" id="s_autoShip" style="width:auto"> Enviar el pedido a ShipStation automáticamente en cuanto queda pagado</label></div>
+        <div class="right-al"><button class="btn gold" id="setSave">Guardar ajustes</button></div></div>
+      <div class="card"><h2>Seguridad del panel</h2><p class="sub">Quién puede entrar aquí y qué se ha hecho. Activa la verificación en 2 pasos: aunque alguien adivine o robe la contraseña, no entra sin tu teléfono.</p>
+        <div id="secBox"></div>
+        <div class="f" style="max-width:340px;margin-top:14px"><label for="s_review">Retener para revisión los pedidos desde (USD)</label><input id="s_review" type="number" min="0" step="10" /><small>Un pedido pagado por este monto o más no pasa a ShipStation hasta que lo apruebes. 0 = no retener por monto. Se guarda con “Guardar ajustes”.</small></div>
+        <h2 style="margin-top:20px;font-size:14px">Bitácora de accesos y cambios</h2>
+        <div class="scroll" style="max-height:320px;overflow:auto"><table class="tbl"><thead><tr><th>Fecha</th><th>IP</th><th>Acción</th><th>Detalle</th></tr></thead><tbody id="secLog"></tbody></table></div></div>
+      <div class="card"><h2>Estado del sistema</h2><div id="sysInfo" class="muted"></div>
+        <div class="right-al" style="justify-content:flex-start"><button class="btn soft sm" id="provTest">Probar conexión con el proveedor</button><button class="btn soft sm" id="apiRefresh2">Volver a leer el catálogo</button></div>
+        <div id="provOut"></div></div>
+    </section>
+  </main>
+</div>
+<div class="modal" id="noteModal"><div class="mbox">
+  <h3 id="nmTitle">Notas</h3><p class="sub" id="nmSub"></p>
+  <div class="f" style="max-width:260px;margin-bottom:14px"><label for="nmGender">Para</label><select id="nmGender"><option value="">Detectar por el nombre</option><option value="Damas">Damas · Women</option><option value="Caballeros">Caballeros · Men</option><option value="Unisex">Unisex</option></select></div>
+  <div class="f"><label>Notas olfativas</label><div class="chips" id="nmNotes"></div><small>Con estas notas el perfume aparece en “Shop by notes” de la tienda.</small></div>
+  <div class="right-al"><button class="btn soft" id="nmAuto">Volver a detección automática</button><button class="btn soft" id="nmCancel">Cancelar</button><button class="btn gold" id="nmSave">Guardar</button></div>
+</div></div>
+<div class="flash" id="flash"></div>
+
+<!-- El servidor escribe la dirección real del JavaScript al servir esta página:
+     vive solo bajo la ruta secreta del panel, no en /admin.js. -->
+<script src="__ADMIN_JS_SRC__"></script>
+
+</body>
+</html>

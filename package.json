@@ -1,0 +1,14 @@
+{
+  "name": "nvos-market",
+  "version": "1.2.0",
+  "private": true,
+  "description": "NVOS Shoppers Inc · tienda de perfumería con Supabase, Square, ShipStation, eBay e inventario propio",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node test/smoke.js",
+    "hash-password": "node tools/hash-password.js"
+  },
+  "engines": { "node": ">=18" }
+}

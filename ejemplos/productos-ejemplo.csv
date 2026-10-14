@@ -1,0 +1,7 @@
+upc,nombre,marca,categoria,subtipo,costo,stock,peso_oz,largo_in,ancho_in,alto_in,mayor_min,mayor_precio,descripcion,imagen,etiquetas,destacado
+7591234000011,Tequeños de queso 20 und,Tequemosh,Refrigerados,Congelados,6.00,40,24,9,6,2,12,7.50,Tequeños congelados listos para freír.,,tequeños;queso,si
+7591234000028,Queso de mano 500 g,AndesFood,Refrigerados,Quesos,5.00,25,18,6,6,3,10,6.20,Queso de mano fresco empacado al vacío.,,queso,si
+7591234000035,Chocolate El Rey Bucare 58% 80 g,El Rey,Chocolates,Tabletas,2.50,100,3,6,3,0.5,24,3.20,Chocolate oscuro de cacao venezolano.,,chocolate;cacao,no
+7591234000059,Cocosette 50 g,Nestlé,Chocolates,Galletas,0.80,300,2,5,2,1,24,1.10,Galleta rellena de crema de coco.,,galleta,si
+7591234000042,Atún Margarita en aceite 170 g,Margarita,Enlatados,Conservas,1.20,200,7,3.5,3.5,1.5,48,1.60,Lomo de atún en aceite vegetal.,,atún;lata,no
+7591234000066,Diablitos Underwood 115 g,Underwood,Enlatados,Untables,1.50,120,5,3,3,1.5,48,1.95,Jamón endiablado untable.,,diablitos,no

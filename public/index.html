@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NVOS Shoppers Inc</title>
+<meta name="description" content="Original fragrances for women, men and unisex. Secure checkout, tracked shipping and order status in your account." />
+<link rel="icon" href="/nvos-logo.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;0,700;1,600&family=Oswald:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/app.css?v=7" />
+<script src="/config.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top" id="top">
+  <div class="wrap top-row">
+    <a class="brand" href="#/" aria-label="Home">
+      <img class="logo" src="/nvos-logo.svg" alt="" />
+      <span class="wm"><span class="n" id="storeName">NV<b>O</b>S</span><span class="s" id="storeTag">Shoppers Inc</span></span>
+    </a>
+    <form class="finder" id="finder" role="search">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="q" type="search" placeholder="Search by product, brand or category" aria-label="Search" autocomplete="off" />
+      <button type="submit">Search</button>
+    </form>
+    <div class="top-acts">
+      <button class="tact" id="langBtn" aria-label="Change language / Cambiar idioma" title="Cambiar a español">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"/></svg>
+        <span id="langLabel">Español</span>
+      </button>
+      <a class="tact" href="#/cuenta" id="acctBtn">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+        <span id="acctLabel">My account</span>
+      </a>
+      <button class="tact bagwrap" id="cartBtn" aria-label="Cart">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="21" r="1.6"/><circle cx="19" cy="21" r="1.6"/><path d="M2 3h3l2.6 12.4a2 2 0 0 0 2 1.6h8.9a2 2 0 0 0 2-1.6L23 7H6"/></svg>
+        <span>Cart</span>
+        <span class="bagcount" id="cartCount">0</span>
+      </button>
+    </div>
+  </div>
+  <nav class="nav" aria-label="Sections">
+    <div class="wrap nav-row" id="catNav"><a href="#/">Home</a></div>
+  </nav>
+</header>
+
+<main id="main"></main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="fbrand">
+          <img class="logo" src="/nvos-logo.svg" alt="" />
+          <span class="n" id="footName">NV<b>O</b>S</span>
+        </div>
+        <p style="margin:0;max-width:36ch" id="footTag">NVOS Shoppers Inc. We bring several suppliers into one marketplace and ship every order from our own warehouse.</p>
+      </div>
+      <div><h5 id="fhBuy">Shop</h5><ul id="footCats">
+        <li><a href="#/catalogo">Catalog</a></li><li><a href="#/marcas">Brands</a></li><li><a href="#/catalogo?destacados=1">Featured</a></li>
+      </ul></div>
+      <div><h5 id="fhAcct">Your account</h5><ul id="fAcctList">
+        <li><a href="#/cuenta">Sign in or register</a></li><li><a href="#/cuenta/pedidos">My orders</a></li><li><a href="#/checkout">Checkout</a></li>
+      </ul></div>
+      <div><h5 id="fhHelp">Help</h5><ul>
+        <li><a id="fHelp1" href="#/ayuda">Shipping &amp; delivery</a></li><li><a id="fHelp2" href="#/ayuda">Returns &amp; exchanges</a></li><li><a id="footWa" href="#/ayuda">Contact</a></li>
+      </ul></div>
+    </div>
+    <div class="foot-end">
+      <span>© <span id="yr"></span> <span id="footName2">NVOS Shoppers Inc</span> · <span id="footRights">All rights reserved</span></span>
+      <div class="pays"><span>Visa</span><span>Mastercard</span><span>Amex</span><span>Zelle</span></div>
+    </div>
+  </div>
+</footer>
+
+<div class="veil" id="veil"></div>
+<aside class="bag" id="drawer" aria-label="Shopping cart" aria-hidden="true">
+  <div class="bag-top"><h3 id="dTitle">Your cart</h3><button class="xb" id="dClose" aria-label="Close">×</button></div>
+  <div class="bag-body" id="dBody"></div>
+  <div class="bag-foot" id="dFoot"></div>
+</aside>
+
+<div class="toast" id="toast" role="status"></div>
+
+<!-- Supabase se sirve desde el propio sitio: si el CDN fuera alterado, podría robar
+     contraseñas y sesiones de clientes. Copia idéntica al paquete oficial de npm
+     (@supabase/supabase-js 2.45.4, sha384 0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o). -->
+<script src="/vendor/supabase-js-2.45.4.min.js"></script>
+<script src="/app.js?v=7"></script>
+</body>
+</html>

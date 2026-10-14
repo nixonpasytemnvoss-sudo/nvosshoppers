@@ -1,0 +1,45 @@
+<svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="NVOS Shoppers Inc">
+  <defs>
+    <linearGradient id="nvGlobe" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2E6FD6"/>
+      <stop offset="1" stop-color="#12275A"/>
+    </linearGradient>
+    <linearGradient id="nvOrbit" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F4D06A"/>
+      <stop offset="0.5" stop-color="#C79A3B"/>
+      <stop offset="1" stop-color="#9A7526"/>
+    </linearGradient>
+    <clipPath id="nvClip"><circle cx="120" cy="112" r="74"/></clipPath>
+  </defs>
+
+  <!-- Globe -->
+  <circle cx="120" cy="112" r="74" fill="url(#nvGlobe)"/>
+  <g clip-path="url(#nvClip)" fill="none" stroke="#8FB6F0" stroke-width="2" opacity="0.7">
+    <ellipse cx="120" cy="112" rx="30" ry="74"/>
+    <ellipse cx="120" cy="112" rx="58" ry="74"/>
+    <line x1="46" y1="112" x2="194" y2="112"/>
+    <path d="M52 74 H188 M52 150 H188"/>
+  </g>
+
+  <!-- Shopping bag silhouette behind the cart -->
+  <path d="M92 96 h56 v54 a6 6 0 0 1-6 6 H98 a6 6 0 0 1-6-6 z" fill="#0E1F49" opacity="0.55"/>
+  <path d="M104 96 v-6 a16 16 0 0 1 32 0 v6" fill="none" stroke="#CFE0F7" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Cart -->
+  <g fill="none" stroke="#EAF1FB" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M100 112 h10 l7 26 h22 l7 -20 h-33"/>
+    <circle cx="120" cy="150" r="4.5" fill="#EAF1FB" stroke="none"/>
+    <circle cx="140" cy="150" r="4.5" fill="#EAF1FB" stroke="none"/>
+  </g>
+
+  <!-- Gold orbit -->
+  <path d="M170 70 a86 60 -18 1 1 -96 92" fill="none" stroke="url(#nvOrbit)" stroke-width="9" stroke-linecap="round"/>
+
+  <!-- Wordmark -->
+  <text x="120" y="212" text-anchor="middle" font-family="Oswald, Arial Narrow, sans-serif" font-weight="600" font-size="44" letter-spacing="1" fill="#173A7A">NV<tspan fill="#C79A3B">O</tspan>S</text>
+  <g stroke="#C79A3B" stroke-width="2">
+    <line x1="70" y1="226" x2="88" y2="226"/>
+    <line x1="152" y1="226" x2="170" y2="226"/>
+  </g>
+  <text x="120" y="231" text-anchor="middle" font-family="Oswald, Arial Narrow, sans-serif" font-weight="400" font-size="14" letter-spacing="6" fill="#173A7A">SHOPPERS INC</text>
+</svg>
