@@ -52,7 +52,14 @@ eBay, Walmart Marketplace y Mercado Libre Int.
 
 - **El precio lo pone el servidor.** El navegador solo envía UPC, cantidades y dirección.
   `priceOrder()` calcula todo; Square cobra `order.totals.total`. Nunca aceptes precios,
-  totales ni descuentos del cliente.
+  totales ni descuentos del cliente. Las líneas del mismo UPC se suman antes de validar
+  el stock (`priceOrder()` consolida en un `Map`), y la cantidad debe ser un entero entero
+  de 1 a 999 (`qtyOf()`): rechaza `"5abc"`, `1.5`, `1e3`.
+- **El impuesto se calcula con el estado del ZIP**, no con el que escribe el comprador.
+  Si el ZIP es de EE. UU. pero el país declarado es otro, manda el ZIP
+  (`TAX.stateFromZip()`, `tax.js`).
+- **La compra nunca lleva precios del cliente**, tampoco por referidos: solo el servidor
+  los saca del catálogo y de `pricing`.
 - **Nunca expongas** costo, datos del proveedor, llaves ni estado interno en rutas públicas
   (`/api/catalog`, `publicOrder`). Hay pruebas que lo verifican.
 - **Secretos solo en variables de entorno.** Nunca en el código, en commits, en logs ni en el
@@ -61,12 +68,19 @@ eBay, Walmart Marketplace y Mercado Libre Int.
 - **CSP estricta**: no añadas `'unsafe-inline'` a `script-src` ni atributos `onclick=`/`onerror=`
   en HTML. Usa `addEventListener` y `data-*`. Todo texto que venga de datos pasa por `esc()`.
 - **Panel**: solo la sesión de cookie da acceso (`isAdmin`). No vuelvas a permitir acceso por
-  correo de cliente. Mantén 2FA, bloqueo por intentos, `ADMIN_PATH`, bitácora (`audit()`).
+  correo de cliente. Mantén 2FA, bloqueo por intentos (también `GLOBAL_FAIL_MAX` /
+  `loginStorm()`), `ADMIN_PATH`, bitácora (`audit()`) y `ADMIN_PASSWORD_HASH` validado
+  (`ADMIN_HASH_OK`: un hash mal pegado no abre con contraseña vacía).
+- La **contraseña del panel nunca se imprime en los registros** (`adminPwGenerated`
+  solo fuera de `NODE_ENV=production`). Un hash mal formado se avisa con
+  `⚠` y `checkPassword()` devuelve `false` hasta corregirlo.
 - **IP real**: usa `clientIp(req)`, nunca el primer valor de `X-Forwarded-For`.
 - **Avisos entrantes** (Square, ShipStation, canales) siempre con firma o secreto verificado en
   tiempo constante; ShipStation solo acepta `resource_url` de su propio dominio.
 - **Cuentas**: pedidos de invitado y saldo de referidos solo para correos verificados
-  (`user.verified`).
+  (`user.verified`). Las compras invitadas con código de referido requieren aprobación
+  manual (`referral.needsReview`, `/api/admin/referrals/approve`). En producción sin
+  llaves de Supabase la sesión queda cerrada (`LOCAL && IS_PROD` en `db.js`).
 - Los pedidos se reservan en serie (`serial()`); no lo quites.
 - Errores en producción: solo número de referencia, nunca el detalle.
 
@@ -91,10 +105,13 @@ Resend, ShipStation, Square, eBay, escáner (UPCitemdb, Google CSE) y marketplac
 
 ## Pendientes conocidos
 
-- Alojar `supabase-js` en el propio sitio (hoy viene de jsDelivr sin SRI).
 - CAPTCHA (Cloudflare Turnstile) en registro y pago.
 - Usuarios separados del panel con permisos.
 - Páginas de producto con URL propia (hoy rutas `#/p/UPC`) para SEO y Google Merchant Center.
 - Sesiones del panel en la base de datos si se escala a varias instancias.
 - Impuestos locales por código postal (TaxJar/Avalara) si el contador lo pide.
 - Walmart y Mercado Libre: solo paquete exportable; falta publicación automática.
+- El aviso de marketplace acepta el total que manda el canal (queda en revisión si el
+  precio llega muy por debajo del publicado); conviene cotejarlo contra la API del canal.
+- El `access_token` de Supabase vive en `localStorage` (legible por un XSS): pasarlo a
+  cookie HttpOnly exigiría mover el inicio de sesión al servidor.
